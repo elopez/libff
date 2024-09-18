@@ -71,7 +71,7 @@ add_library(
 target_link_libraries(
   ff
 
-  GMP::gmp
+  gmp
   ${PROCPS_LIBRARIES}
   ${FF_EXTRALIBS}
 )

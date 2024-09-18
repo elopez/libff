@@ -105,9 +105,9 @@ else()
   set(gmp_library_type STATIC)
 endif()
 message(STATUS "GMP: ${GMP_LIBRARY}, ${GMP_INCLUDE_DIR}")
-add_library(GMP::gmp ${gmp_library_type} IMPORTED)
+add_library(gmp ${gmp_library_type} IMPORTED)
 set_target_properties(
-  GMP::gmp PROPERTIES
+  gmp PROPERTIES
   IMPORTED_LOCATION ${GMP_LIBRARY}
   INTERFACE_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR}
 )
