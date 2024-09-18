@@ -109,6 +109,7 @@ add_library(gmp ${gmp_library_type} IMPORTED)
 set_target_properties(
   gmp PROPERTIES
   IMPORTED_LOCATION ${GMP_LIBRARY}
+  IMPORTED_IMPLIB ${GMP_LIBRARY}
   INTERFACE_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR}
 )
 
