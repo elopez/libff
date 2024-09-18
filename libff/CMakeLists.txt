@@ -124,6 +124,12 @@ install(
 
 # Tests
 if ("${IS_LIBFF_PARENT}")
+  # For clock_gettime in Windows
+  set(TEST_EXTRALIBS)
+  if(MSYS)
+    set(TEST_EXTRALIBS winpthread)
+  endif()
+
   # Tests for fpn fields.
   add_executable(
     algebra_bilinearity_test
@@ -136,6 +142,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -149,6 +156,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -162,6 +170,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -175,6 +184,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -188,6 +198,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -201,6 +212,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   add_executable(
@@ -214,6 +226,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ff
     gtest_main
+    ${TEST_EXTRALIBS}
   )
 
   include(CTest)
@@ -268,6 +281,7 @@ if ("${IS_LIBFF_PARENT}")
 
     ${OPENSSL_LIBRARIES}
     ff
+    ${TEST_EXTRALIBS}
   )
 
   add_dependencies(profile multiexp_profile)
