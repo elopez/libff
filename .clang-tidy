@@ -16,10 +16,23 @@ Checks:
     performance-*,
     portability-*,
     readability-*,
+    -readability-identifier-length,
     -readability-isolate-declaration,
     -readability-magic-numbers,
     -readability-function-size,
-    -clang-diagnostic-deprecated-copy
+    -clang-diagnostic-deprecated-copy,
+    -bugprone-easily-swappable-parameters,
+    -bugprone-narrowing-conversions,
+    -bugprone-reserved-identifier,
+    -llvm-include-order,
+    -modernize-use-bool-literals,
+    -modernize-use-emplace,
+    -modernize-use-using,
+    -readability-braces-around-statements,
+    -readability-duplicate-include,
+    -readability-function-cognitive-complexity,
+    -readability-implicit-bool-conversion,
+    -readability-suspicious-call-argument
 WarningsAsErrors:
     ''
 
