@@ -4,28 +4,67 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            shell: bash
+          - os: windows-latest
+            shell: msys2 {0}
+            cmake-flags: -G "MSYS Makefiles"
+    runs-on: ${{ matrix.os }}
+    name: build (${{ matrix.os }})
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
     - uses: actions/checkout@v4
     - name: python_setup
+      if: runner.os == 'Linux'
       uses: actions/setup-python@v5
       with:
         python-version: 3.8
-    - name: before_install
+    - name: before_install (linux deps)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get install build-essential git libboost-all-dev cmake libgmp3-dev libssl-dev libsodium-dev libprocps-dev pkg-config gcc-10 g++-10
         sudo apt-get install clang-tidy
+    - name: before_install (windows deps)
+      uses: msys2/setup-msys2@v2
+      if: runner.os == 'Windows'
+      with:
+        msystem: CLANG64
+        path-type: minimal
+        update: true
+        install: >-
+          base-devel
+          gmp-devel
+          openssl-devel
+          git
+          make
+        pacboy: >-
+          cmake:p
+          clang:p
+          clang-tools-extra:p
+          gmp:p
+          boost:p
+          openssl:p
+          libsodium:p
+          pkg-config:p
+    - name: before_install
+      run: |
         git submodule init && git submodule update
         mkdir build
         cd build
         PATH=$PATH:${PWD}
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_CLANG_TIDY=ON ..
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_CLANG_TIDY=ON ${{ matrix.cmake-flags }} ..
     - name: run_clang_tidy
       id: clang_tidy
+      if: runner.os == 'Linux'
       run: |
         cd build
-        OUTPUT=$(python3 run-clang-tidy.py ../libff/algebra ../libff/common -quiet 2>&1)
-        COUNT=$(echo "$OUTPUT" | grep "warning:" | wc -l)
+        python3 run-clang-tidy.py ../libff/algebra ../libff/common -quiet 2>&1 | tee tidy.log
+        COUNT=$(cat tidy.log | { grep -c "warning:" || true; })
         {
           echo "OUTPUT<<EOF"
           echo "$OUTPUT"
@@ -33,7 +72,7 @@ jobs:
           echo "COUNT=$COUNT"
         } >> "$GITHUB_OUTPUT"
     - name: check_errors
-      if: steps.clang_tidy.outputs.COUNT > 0
+      if: runner.os == 'Linux' && steps.clang_tidy.outputs.COUNT > 0
       run: |
         echo "Clang-tidy failed. Please look at the run_clang_tidy step to see the details."
         exit 1
@@ -47,6 +86,6 @@ jobs:
         rm -r build
         mkdir build
         cd build
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_CLANG_TIDY=OFF -DDEBUG=ON .. 
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_CLANG_TIDY=OFF -DDEBUG=ON ${{ matrix.cmake-flags }} ..
         make
         make check  
