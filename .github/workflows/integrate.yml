@@ -2,6 +2,10 @@ name: main
 
 on: push
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -15,7 +19,8 @@ jobs:
             cmake-flags: -G "MSYS Makefiles"
           - os: macos-latest
             shell: bash
-            cmake-flags: -DCURVE=ALT_BN128 -DUSE_CLANG_TIDY=OFF
+            # ASM is unsupported on aarch64
+            cmake-flags: -DCURVE=ALT_BN128 -DUSE_ASM=OFF -DUSE_CLANG_TIDY=OFF
     runs-on: ${{ matrix.os }}
     name: build (${{ matrix.os }})
     defaults:
