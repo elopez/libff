@@ -221,7 +221,7 @@ if ("${IS_LIBFF_PARENT}")
   endif()
 
   # Add a `make check` target that builds and tests
-  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --rerun-failed --output-on-failure)
 
   # Add a `make profile` target that builds and profiles
   add_custom_target(
