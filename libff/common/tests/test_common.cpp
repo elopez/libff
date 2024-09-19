@@ -7,13 +7,14 @@
  * @copyright  MIT license (see LICENSE file)
  *****************************************************************************/
 
-#include <cstdint>
-#include <gtest/gtest.h>
-
-#include "libff/common/utils.hpp"
-#include "libff/algebra/fields/binary/gf32.hpp"
 #include "libff/algebra/curves/edwards/edwards_pp.hpp"
 #include "libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp"
+#include "libff/algebra/fields/binary/gf32.hpp"
+#include "libff/common/utils.hpp"
+
+#include <gtest/gtest.h>
+
+#include <cstdint>
 
 using namespace libff;
 

@@ -7,11 +7,12 @@
  *             and contributors (see AUTHORS).
  * @copyright  MIT license (see LICENSE file)
  *****************************************************************************/
+#include "libff/algebra/curves/edwards/edwards_fields.hpp"
+#include "libff/algebra/field_utils/algorithms.hpp"
 #include "libff/algebra/field_utils/bigint.hpp"
 #include "libff/algebra/field_utils/field_utils.hpp"
-#include "libff/algebra/field_utils/algorithms.hpp"
 #include "libff/algebra/fields/binary/gf64.hpp"
-#include "libff/algebra/curves/edwards/edwards_fields.hpp"
+
 #include <gtest/gtest.h>
 
 using namespace libff;
