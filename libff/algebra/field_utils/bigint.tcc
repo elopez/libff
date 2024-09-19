@@ -27,39 +27,31 @@ bigint<n>::bigint(const unsigned long x) /// Initalize from a small integer
 template<mp_size_t n>
 bigint<n>::bigint(const char* s) /// Initialize from a string containing an integer in decimal notation
 {
-    size_t l = strlen(s);
-    unsigned char* s_copy = new unsigned char[l];
+    mpz_t k;
+    mpz_init_set_str(k, s, 10);
 
-    for (size_t i = 0; i < l; ++i)
-    {
-        assert(s[i] >= '0' && s[i] <= '9');
-        s_copy[i] = s[i] - '0';
-    }
-
-    mp_size_t limbs_written = mpn_set_str(this->data, s_copy, l, 10);
 #ifndef NDEBUG
-    assert(limbs_written <= n);
-#else
-    UNUSED(limbs_written);
+    assert(mpz_size(k) <= n);
 #endif
 
-    delete[] s_copy;
+    for (size_t i = 0; i < n; ++i)
+    {
+        data[i] = mpz_getlimbn(k, i);
+    }
+    mpz_clear(k);
 }
 
 template<mp_size_t n>
 bigint<n>::bigint(const mpz_t r) /// Initialize from MPZ element
 {
-    mpz_t k;
-    mpz_init_set(k, r);
+#ifndef NDEBUG
+    assert(mpz_size(r) <= n);
+#endif
 
     for (size_t i = 0; i < n; ++i)
     {
-        data[i] = mpz_get_ui(k);
-        mpz_fdiv_q_2exp(k, k, GMP_NUMB_BITS);
+        data[i] = mpz_getlimbn(r, i);
     }
-
-    assert(mpz_sgn(k) == 0);
-    mpz_clear(k);
 }
 
 
@@ -150,7 +142,10 @@ size_t bigint<n>::num_bits() const
         }
         else
         {
-            return ((i+1) * GMP_NUMB_BITS) - __builtin_clzl(x);
+            if(sizeof(x) == sizeof(unsigned long))
+                return ((i+1) * GMP_NUMB_BITS) - __builtin_clzl(x);
+            else
+                return ((i+1) * GMP_NUMB_BITS) - __builtin_clzll(x);
         }
     }
     return 0;
@@ -165,13 +160,10 @@ unsigned long bigint<n>::as_ulong() const
 template<mp_size_t n>
 void bigint<n>::to_mpz(mpz_t r) const
 {
-    mpz_set_ui(r, 0);
-
-    for (int i = n-1; i >= 0; --i)
-    {
-        mpz_mul_2exp(r, r, GMP_NUMB_BITS);
-        mpz_add_ui(r, r, this->data[i]);
-    }
+    mp_limb_t* xp;
+    xp = mpz_limbs_modify(r, n);
+    memcpy(xp, this->data, sizeof(this->data[0]) * n);
+    mpz_limbs_finish(r, n);
 }
 
 template<mp_size_t n>
