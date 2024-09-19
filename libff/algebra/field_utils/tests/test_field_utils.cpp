@@ -13,6 +13,7 @@
 #include "libff/algebra/field_utils/field_utils.hpp"
 #include "libff/algebra/fields/binary/gf64.hpp"
 
+#include <gmp.h>
 #include <gtest/gtest.h>
 
 using namespace libff;
@@ -52,6 +53,32 @@ TEST(ExponentiationTest, SimpleTest) {
 
         X_i *= X;
     }
+}
+
+TEST(FieldUtilsTest, BigintConversionTest)
+{
+    bigint<3> x;
+    char buf[100] = {}, buf2[100] = {};
+    mpz_t mpz_in, mpz_out;
+    mpz_init(mpz_out);
+
+    const char *x_str = "987654567895678909876876545678909876543456";
+    x = bigint<3>(x_str);
+    x.to_mpz(mpz_out);
+    gmp_snprintf(buf, 100, "%Zd", mpz_out);
+    EXPECT_TRUE(strcmp(buf, x_str) == 0);
+
+    mpz_init_set_str(mpz_in, x_str, 10);
+    x = bigint<3>(mpz_in);
+    x.to_mpz(mpz_out);
+    gmp_snprintf(buf, 100, "%Zd", mpz_out);
+    EXPECT_TRUE(strcmp(buf, x_str) == 0);
+
+    x = bigint<3>(ULONG_MAX);
+    x.to_mpz(mpz_out);
+    gmp_snprintf(buf, 100, "%Zd", mpz_out);
+    gmp_snprintf(buf2, 100, "%lu", ULONG_MAX);
+    EXPECT_TRUE(strcmp(buf, buf2) == 0);
 }
 
 TEST(FieldUtilsTest, BigintTest)
